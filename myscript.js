@@ -153,6 +153,7 @@ function BoxDetect(x,y,rows,columns)
 {
 	xdis = HorizontalDistanceBetween2Lines;
 	ydis = VerticalDistanceBetween2Lines;
+	var flag = 0;
 	for(r = 0;r < rows; ++r)
 	{
 		for(c =0 ;c < columns; ++c)
@@ -163,6 +164,11 @@ function BoxDetect(x,y,rows,columns)
 			{
 				//console.log("yo we found something");
 				balls[r][c].Status = 1;
+				flag = 1;
+				break;
+			}
+			if(flag)
+			{
 				break;
 			}
 
