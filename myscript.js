@@ -7,13 +7,33 @@ var GridEndY = canvas.height - 10;
 var HorizontalDistanceBetween2Lines = -1;
 var VerticalDistanceBetween2Lines = -1;
 var balls = [];
-var x = 10;
-var y = 10;
+var x = 10//center x coordinate for first circle
+var y = 10//center y coordinate for second circle
 var dx = -2;
 var dy = +2;
 var grid = [];
+var colors = ['#800000','#228B22'];
+var players = [];
+var total_players = 2;//By Deafult number of players
+var currentPlayer = 0;//by default current player is first
+function Player(id,color)
+{
+	this.id = id;
+	this.color = color;
+	this.printPlayerInfo = function(){
+		console.log("Player id: "+this.id+" and color is: "+this.color);
+	}
+}
+function initializePlayers(num=2)
+{
+	total_players = num;
 
-
+	for(count = 0;count<num;++count)
+	{
+		players[count] = new Player(count,colors[count]);
+	}
+	//currentPlayer = players[0];
+}
 //Always call it after DrawGrid()
 function initializeGrid(rows,columns)
 {
@@ -44,7 +64,7 @@ function DrawVerticalLines(num)
 		ctx.lineTo(StartX,EndY);
 		StartX = StartX + DistanceBetween2Lines;
 	}
-	ctx.strokeStyle = "#0066cc";
+	ctx.strokeStyle = players[currentPlayer].color ;
 	ctx.stroke();
 	ctx.closePath();
 	return DistanceBetween2Lines;
@@ -68,7 +88,7 @@ function DrawHorizontalLines(num)
 		StartY = StartY + DistanceBetween2Lines;
 
 	}
-	ctx.strokeStyle = "#0066cc";
+	ctx.strokeStyle = players[currentPlayer].color;
 	ctx.stroke();
 	ctx.closePath();
 	return DistanceBetween2Lines;
@@ -81,7 +101,7 @@ function DrawGrid(rows,columns)
 	return Math.min(HorizontalDistanceBetween2Lines,VerticalDistanceBetween2Lines);
 }
 
-function intializeBalls(rows,columns)
+function intializeBalls(rows,columns)//Status  = 0 means box is empty
 {
 	
 	for(r = 0;r < rows; ++r)
@@ -89,7 +109,7 @@ function intializeBalls(rows,columns)
 		balls[r] = [];
 		for(c = 0;c < columns; ++c)
 		{
-			balls[r][c] = {x:0,y:0,Status:0};
+			balls[r][c] = {x:0,y:0,Status:0,player_id:0};
 		}
 	}
 }
@@ -105,13 +125,12 @@ function DrawBall(x,y,ballRadius,color)
 	}
 	
 }
+//x1,y1 corresponds to left start grid
 function DrawBalls(rows,columns,ballRadius,x1,y1)
 {
-	xdis = HorizontalDistanceBetween2Lines;
-	ydis = VerticalDistanceBetween2Lines;
-	//console.log("Horizontal and vertical distance between circles "+ xdis+ " "+ydis);
-	var x = x1 + xdis/2;
-	var y = y1 + ydis/2;
+
+	var x = x1+HorizontalDistanceBetween2Lines/2;
+	var y = y1+VerticalDistanceBetween2Lines/2;
 	color = "#0095DD";
 	
 
@@ -119,9 +138,9 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 	{
 		for(c =0 ;c < columns; ++c)
 		{
-			balls[r][c].x = x + c * xdis;
-			balls[r][c].y = y + r * ydis;
-			DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,color);
+			balls[r][c].x = x + c * HorizontalDistanceBetween2Lines;
+			balls[r][c].y = y + r * VerticalDistanceBetween2Lines;
+			DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
 
 		}
 	}
@@ -129,25 +148,47 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 	
 
 }
+
 function Draw()
 {
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	MaxDiameter = DrawGrid(10,10);
+
+	var ballRadius = MaxDiameter/6;
 	
 	//console.log("MaxDiameter of circles can be "+MaxDiameter+" px");
 	
-	//x+=dx;
-	//y+=dy;
-	DrawBalls(10,10,MaxDiameter/6,x,y);
+	x+=dx;
+	y+=dy;
+	var xdis = HorizontalDistanceBetween2Lines/2;
+	var ydis = VerticalDistanceBetween2Lines/2;
+	DrawBalls(10,10,ballRadius,x,y);
+	
+	if(x+ballRadius+xdis>HorizontalDistanceBetween2Lines||x+xdis<ballRadius||y+ballRadius+ydis>VerticalDistanceBetween2Lines||y+ydis<ballRadius)
+	{
+		dx=-dx;
+		dy=-dy;
+	}
+	
 	//dx=-dx;
 	//dy=-dy;
 	//requestAnimationFrame(Draw);
 }
-intializeBalls(10,10);
 
-//setInterval(Draw,50);
-Draw();
-initializeGrid(10,10);
+
+
+
+
+function init()
+{
+	initializePlayers(2);
+	intializeBalls(10,10);
+	Draw();
+	initializeGrid(10,10);
+	
+}
+init();
+setInterval(Draw,50);
 canvas.addEventListener("click",mouseClickHandler,false);
 function BoxDetect(x,y,rows,columns)
 {
@@ -163,17 +204,27 @@ function BoxDetect(x,y,rows,columns)
 			if(x1<=x&&x<=x1+xdis&&y1<=y&&y<=y1+ydis)
 			{
 				//console.log("yo we found something");
-				balls[r][c].Status = 1;
-				flag = 1;
-				break;
+				if(balls[r][c].Status == 0)
+				{
+					balls[r][c].Status = 1;
+					balls[r][c].player_id = currentPlayer;
+					currentPlayer = (currentPlayer+1)%2;
+					flag = 1;
+					break;
+				}
+				//else if()
+				
 			}
 			if(flag)
 			{
+
 				break;
+
 			}
 
 		}
 	}
+
 }
 function mouseClickHandler(e)
 {
@@ -181,7 +232,7 @@ function mouseClickHandler(e)
 	var relativeY = e.clientY-canvas.offsetTop;
 	//console.log("xcord: "+relativeX+" ycord: "+relativeY);
 	BoxDetect(relativeX,relativeY,10,10);
-	Draw();
+	//Draw();
 	//console.log("xcord balls: "+grid[1][0].x+" ycord: "+grid[1][0].y);
 	//xdis = HorizontalDistanceBetween2Lines;
 	//ydis = VerticalDistanceBetween2Lines;
@@ -192,3 +243,4 @@ function mouseClickHandler(e)
 	//console.log("xcord balls end: "+mm+" ycord end: "+pp);
 	//console.log("xcord balls: "+grid[0][1].x+" ycord: "+grid[0][1].y);
 }
+
