@@ -115,17 +115,17 @@ function intializeBalls(rows,columns)//Status  = 0 means box is empty
 }
 function DrawBall(x,y,ballRadius,color)
 {
-	if(balls[r][c].Status == 1)
-	{
+	
 		ctx.beginPath();
 		ctx.arc(x,y,ballRadius,0,Math.PI*2);
 		ctx.fillStyle = color;
 		ctx.fill();
 		ctx.closePath();	
-	}
+	
 	
 }
 //x1,y1 corresponds to left start grid
+//only call it after mouse click detected
 function DrawBalls(rows,columns,ballRadius,x1,y1)
 {
 
@@ -140,8 +140,21 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 		{
 			balls[r][c].x = x + c * HorizontalDistanceBetween2Lines;
 			balls[r][c].y = y + r * VerticalDistanceBetween2Lines;
-			DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
-
+			if(balls[r][c].Status == 1)
+			{
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+			}
+			else if(balls[r][c].Status == 2)
+			{
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+			}
+			else if(balls[r][c].Status >= 3)
+			{
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x,balls[r][c].y-10,ballRadius,players[balls[r][c].player_id].color);
+			}
 		}
 	}
 	
@@ -190,6 +203,7 @@ function init()
 init();
 setInterval(Draw,50);
 canvas.addEventListener("click",mouseClickHandler,false);
+
 function BoxDetect(x,y,rows,columns)
 {
 	xdis = HorizontalDistanceBetween2Lines;
@@ -212,7 +226,14 @@ function BoxDetect(x,y,rows,columns)
 					flag = 1;
 					break;
 				}
-				//else if()
+				else if(currentPlayer == balls[r][c].player_id)
+				{
+					balls[r][c].Status++;
+					currentPlayer = (currentPlayer+1)%2;
+					flag = 1;
+					break;
+				}
+				
 				
 			}
 			if(flag)
