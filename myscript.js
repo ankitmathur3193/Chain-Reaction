@@ -9,13 +9,22 @@ var VerticalDistanceBetween2Lines = -1;
 var balls = [];
 var x = 10//center x coordinate for first circle
 var y = 10//center y coordinate for second circle
-var dx = -2;
-var dy = +2;
+var dx = 0;
+var dy = 0;
 var grid = [];
 var colors = ['#800000','#228B22'];
 var players = [];
 var total_players = 2;//By Deafult number of players
 var currentPlayer = 0;//by default current player is first
+var to_animate = [];
+var lock = false;
+var animateFlag = false;
+var Rows = 10;
+var Columns = 10;
+var to_translate = [];
+var iter_translate = 0;
+var dx1=4;
+var dy1=4;
 function Player(id,color)
 {
 	this.id = id;
@@ -142,15 +151,18 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 			balls[r][c].y = y + r * VerticalDistanceBetween2Lines;
 			if(balls[r][c].Status == 1)
 			{
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+				//console.log("Ball Drawn at ",r," ",c);
+				DrawBall(balls[r][c].x-dx,balls[r][c].y-dy,ballRadius,players[balls[r][c].player_id].color);
 			}
 			else if(balls[r][c].Status == 2)
 			{
+				//console.log("Ball Drawn at ",r," ",c);
 				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
 				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
 			}
-			else if(balls[r][c].Status >= 3)
+			else if(balls[r][c].Status == 3)
 			{
+				//console.log("Ball Drawn at ",r," ",c);
 				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
 				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
 				DrawBall(balls[r][c].x,balls[r][c].y-10,ballRadius,players[balls[r][c].player_id].color);
@@ -161,27 +173,157 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 	
 
 }
-
+function CheckStatus(rows,columns)
+{
+	var flag = false;
+	for(r = 0;r < rows; ++r)
+	{
+		for(c = 0;c < columns; ++c)
+		{
+			if(balls[r][c].Status == 4)
+			{
+				to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
+				balls[r][c].Status = 0;
+				balls[r][c].player_id = 0;
+				flag = true;
+				console.log("Status == 4 found at ",r," ",c);
+			}
+		}
+	}
+	return flag;
+}
+function func(x,y)
+{
+	if(x>=0&&x<Columns&&y>=0&&y<Rows)
+		return true;
+	else
+		return false;
+}
+function bfs()
+{
+	for(i = 0;i < to_animate.length; ++i)
+	{
+		var x1 = to_animate[i].x;
+		var y1 = to_animate[i].y;
+		var id = to_animate[i].id;
+		if(func(x1+1,y1))
+		{
+			to_translate.push({x:x1,y:y1,a:1,b:0,id:id});
+		}
+		if(func(x1-1,y1))
+		{
+			to_translate.push({x:x1,y:y1,a:-1,b:0,id:id});
+		}
+		if(func(x1,y1+1))
+		{
+			to_translate.push({x:x1,y:y1,a:0,b:1,id:id});
+		}
+		if(func(x1,y1-1))
+		{
+			to_translate.push({x:x1,y:y1,a:0,b:-1,id:id});
+		}
+		
+	}
+}
+function DrawBallTraversal(ballRadius)
+{
+	for(i = 0;i < to_translate.length ;++i)
+	{
+		var x1 = to_translate[i].x;
+		var y1 = to_translate[i].y;
+		var id = to_translate[i].id;
+		var a = to_translate[i].a;
+		var b = to_translate[i].b;
+		var r = balls[x1][y1].x;
+		var c = balls[x1][y1].y;
+		r = r + a*dx1;
+		c = c + b*dy1;
+		DrawBall(r,c,ballRadius,colors[id]);
+		
+	}
+}
+function updateStatus(x,y,id)
+{
+	console.log("Status updated for ",x," ",y);
+	balls[x][y].Status+=1;
+	balls[x][y].player_id=id;
+}
+function updateNeighbour()
+{
+	for(i = 0;i < to_animate.length; ++i)
+	{
+		var x1 = to_animate[i].x;
+		var y1 = to_animate[i].y;
+		var id = to_animate[i].id;
+		if(func(x1+1,y1))
+		{
+			//console.log("Going for Status update for ",x1+1," ",y);
+			updateStatus(x1+1,y1,id);
+		}
+		if(func(x1-1,y1))
+		{
+			updateStatus(x1-1,y1,id);
+		}
+		if(func(x1,y1+1))
+		{
+			updateStatus(x1,y1+1,id);
+		}
+		if(func(x1,y1-1))
+		{
+			updateStatus(x1,y1-1,id);
+		}
+		
+	}
+}
 function Draw()
 {
 	ctx.clearRect(0,0,canvas.width,canvas.height);
-	MaxDiameter = DrawGrid(10,10);
+	MaxDiameter = DrawGrid(Rows,Columns);
 
 	var ballRadius = MaxDiameter/6;
 	
 	//console.log("MaxDiameter of circles can be "+MaxDiameter+" px");
 	
-	x+=dx;
-	y+=dy;
+	//x+=dx;
+	//y+=dy;
 	var xdis = HorizontalDistanceBetween2Lines/2;
 	var ydis = VerticalDistanceBetween2Lines/2;
-	DrawBalls(10,10,ballRadius,x,y);
+	if(animateFlag||CheckStatus(Rows,Columns))
+	{
+		if(!animateFlag)
+		{
+			//console.log("goind to do bfs");
+			bfs();
+			iter_translate = 0;
+			dx1 = 2;
+			dy1 = 2;
+			animateFlag = true;
+		}
+		else if(iter_translate<10)
+		{
+			//console.log("Doing ball traversal animation");
+			DrawBallTraversal(ballRadius);
+			dx1+=2;
+			dy1+=2;
+			iter_translate++;
+		}
+		else
+		{
+			//console.log("Updating Neighbour Status");
+			updateNeighbour();
+			to_animate = [];
+			to_translate = [];
+			animateFlag = false;
+		}
+	}
+
+	DrawBalls(Rows,Columns,ballRadius,x,y);
 	
-	if(x+ballRadius+xdis>HorizontalDistanceBetween2Lines||x+xdis<ballRadius||y+ballRadius+ydis>VerticalDistanceBetween2Lines||y+ydis<ballRadius)
+	/*if(x+ballRadius+xdis>HorizontalDistanceBetween2Lines||x+xdis<ballRadius||y+ballRadius+ydis>VerticalDistanceBetween2Lines||y+ydis<ballRadius)
 	{
 		dx=-dx;
 		dy=-dy;
-	}
+	}*/
 	
 	//dx=-dx;
 	//dy=-dy;
@@ -195,13 +337,13 @@ function Draw()
 function init()
 {
 	initializePlayers(2);
-	intializeBalls(10,10);
+	intializeBalls(Rows,Columns);
 	Draw();
-	initializeGrid(10,10);
+	initializeGrid(Rows,Columns);
 	
 }
 init();
-setInterval(Draw,50);
+setInterval(Draw,40);
 canvas.addEventListener("click",mouseClickHandler,false);
 
 function BoxDetect(x,y,rows,columns)
@@ -252,7 +394,7 @@ function mouseClickHandler(e)
 	var relativeX = e.clientX-canvas.offsetLeft;
 	var relativeY = e.clientY-canvas.offsetTop;
 	//console.log("xcord: "+relativeX+" ycord: "+relativeY);
-	BoxDetect(relativeX,relativeY,10,10);
+	BoxDetect(relativeX,relativeY,Rows,Columns);
 	//Draw();
 	//console.log("xcord balls: "+grid[1][0].x+" ycord: "+grid[1][0].y);
 	//xdis = HorizontalDistanceBetween2Lines;
