@@ -192,11 +192,12 @@ function CheckStatus(rows,columns)
 		{
 			if((r==0&&c==0)||(r==0&&c==Columns-1)||(r==Rows-1&&c==0)||(r==Rows-1&&c==Columns-1))
 			{
-				if(balls[r][c].Status == 2)
+				if(balls[r][c].Status >= 2)
 				{
 					//console.log("animate for two "+r+" "+c);
 					to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
-					balls[r][c].Status = 0;
+					balls[r][c].Status-=2;
+					if(balls[r][c].Status==0)
 					balls[r][c].player_id = 0;
 					flag = true;
 					//console.log("Status == 4 found at ",r," ",c);
@@ -204,19 +205,21 @@ function CheckStatus(rows,columns)
 			}
 			else if(((r==0||r==Rows-1)&&(c>0&&c<Columns-1))||((c==0||c==Columns-1)&&(r>0&&r<Rows-1)))
 			{
-				if(balls[r][c].Status == 3)
+				if(balls[r][c].Status>=3)
 				{
 					to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
-					balls[r][c].Status = 0;
+					balls[r][c].Status-=3;
+					if(balls[r][c].Status==0)
 					balls[r][c].player_id = 0;
 					flag = true;
 					//console.log("Status == 4 found at ",r," ",c);
 				}
 			}
-			else if(balls[r][c].Status == 4)
+			else if(balls[r][c].Status>=4)
 			{
 				to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
-				balls[r][c].Status = 0;
+				balls[r][c].Status-=4;
+				if(balls[r][c].Status==0)
 				balls[r][c].player_id = 0;
 				flag = true;
 				//console.log("Status == 4 found at ",r," ",c);
