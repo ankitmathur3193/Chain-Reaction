@@ -19,8 +19,8 @@ var currentPlayer = 0;//by default current player is first
 var to_animate = [];
 var lock = false;
 var animateFlag = false;
-var Rows = 10;
-var Columns = 10;
+var Rows = 8;
+var Columns = 8;
 var to_translate = [];
 var iter_translate = 0;
 var dx1=4;
@@ -431,7 +431,7 @@ function init()
 }
 init();
 //setInterval(Draw,40);
-canvas.addEventListener("click",mouseClickHandler,false);
+//canvas.addEventListener("click",mouseClickHandler,false);
 
 function BoxDetect(x,y,rows,columns)
 {
@@ -476,8 +476,20 @@ function BoxDetect(x,y,rows,columns)
 	}
 
 }
+var temp = $(myCanvas);
+temp.on( "click", function( event ) {
+ // console.log( "pageX: " + event.pageX + ", pageY: " + event.pageY );
+  var offset = temp.offset();
+  //console.log("left: "+offset.left+" ,top: "+offset.top);
+  var relativeX = event.pageX-offset.left;
+  var relativeY = event.pageY-offset.top;
+  //console.log("x: "+relativeX+" ,y: "+relativeY);
+  BoxDetect(relativeX,relativeY,Rows,Columns);
+});
 function mouseClickHandler(e)
 {
+	console.log(e.clientX+" "+e.clientY);
+	console.log(canvas.offsetLeft+" "+canvas.offsetTop);
 	var relativeX = e.clientX-canvas.offsetLeft;
 	var relativeY = e.clientY-canvas.offsetTop;
 	//console.log("xcord: "+relativeX+" ycord: "+relativeY);
