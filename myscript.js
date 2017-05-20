@@ -25,6 +25,14 @@ var to_translate = [];
 var iter_translate = 0;
 var dx1=4;
 var dy1=4;
+
+/*
+
+In x,y corrdinate space
+row = y axis
+column = x axis
+*/
+
 function Player(id,color)
 {
 	this.id = id;
@@ -44,7 +52,7 @@ function initializePlayers(num=2)
 	//currentPlayer = players[0];
 }
 //Always call it after DrawGrid()
-function initializeGrid(rows,columns)
+function initializeGrid(rows,columns)//grid[r][c] = top left cordinates for r,c box
 {
 	var x1 = 10;
 	var y1 = 10;
@@ -59,6 +67,7 @@ function initializeGrid(rows,columns)
 		}
 	}
 }
+
 function DrawVerticalLines(num)
 {
 	var DistanceBetween2Lines = (canvas.width-20)/num;
@@ -152,7 +161,7 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 			if(balls[r][c].Status == 1)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x-dx,balls[r][c].y-dy,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
 			}
 			else if(balls[r][c].Status == 2)
 			{
@@ -186,15 +195,16 @@ function CheckStatus(rows,columns)
 				balls[r][c].Status = 0;
 				balls[r][c].player_id = 0;
 				flag = true;
-				console.log("Status == 4 found at ",r," ",c);
+				//console.log("Status == 4 found at ",r," ",c);
 			}
 		}
 	}
 	return flag;
 }
-function func(x,y)
+//func(column,row)->It checks if given row,column is within grid or not.
+function func(column,row)
 {
-	if(x>=0&&x<Columns&&y>=0&&y<Rows)
+	if(column>=0&&column<Columns&&row>=0&&row<Rows)
 		return true;
 	else
 		return false;
@@ -208,19 +218,23 @@ function bfs()
 		var id = to_animate[i].id;
 		if(func(x1+1,y1))
 		{
-			to_translate.push({x:x1,y:y1,a:1,b:0,id:id});
+			//console.log("Increasing Row y",x1," ",y1);
+			to_translate.push({x:x1,y:y1,a:0,b:1,id:id});
 		}
 		if(func(x1-1,y1))
 		{
-			to_translate.push({x:x1,y:y1,a:-1,b:0,id:id});
+			//console.log("Decreasing  Row y",x1," ",y1);
+			to_translate.push({x:x1,y:y1,a:0,b:-1,id:id});
 		}
 		if(func(x1,y1+1))
 		{
-			to_translate.push({x:x1,y:y1,a:0,b:1,id:id});
+			//console.log("Increasing Columns x",x1," ",y1);
+			to_translate.push({x:x1,y:y1,a:1,b:0,id:id});
 		}
 		if(func(x1,y1-1))
 		{
-			to_translate.push({x:x1,y:y1,a:0,b:-1,id:id});
+			//console.log("Decreasing  Columns x",x1," ",y1);
+			to_translate.push({x:x1,y:y1,a:-1,b:0,id:id});
 		}
 		
 	}
@@ -244,7 +258,7 @@ function DrawBallTraversal(ballRadius)
 }
 function updateStatus(x,y,id)
 {
-	console.log("Status updated for ",x," ",y);
+	//console.log("Status updated for ",x," ",y);
 	balls[x][y].Status+=1;
 	balls[x][y].player_id=id;
 }
@@ -314,6 +328,7 @@ function Draw()
 			to_animate = [];
 			to_translate = [];
 			animateFlag = false;
+			iter_translate = 0;
 		}
 	}
 
@@ -327,7 +342,7 @@ function Draw()
 	
 	//dx=-dx;
 	//dy=-dy;
-	//requestAnimationFrame(Draw);
+	requestAnimationFrame(Draw);
 }
 
 
@@ -343,7 +358,7 @@ function init()
 	
 }
 init();
-setInterval(Draw,40);
+//setInterval(Draw,40);
 canvas.addEventListener("click",mouseClickHandler,false);
 
 function BoxDetect(x,y,rows,columns)
@@ -359,7 +374,7 @@ function BoxDetect(x,y,rows,columns)
 			y1=grid[r][c].y ;
 			if(x1<=x&&x<=x1+xdis&&y1<=y&&y<=y1+ydis)
 			{
-				//console.log("yo we found something");
+				//console.log("Touch found at ",r," ",c);
 				if(balls[r][c].Status == 0)
 				{
 					balls[r][c].Status = 1;
