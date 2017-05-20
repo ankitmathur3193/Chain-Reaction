@@ -1,3 +1,4 @@
+$(document).ready(function(){
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var GridStartX = 10;
@@ -509,3 +510,4 @@ function mouseClickHandler(e)
 	//console.log("xcord balls: "+grid[0][1].x+" ycord: "+grid[0][1].y);
 }
 
+});
