@@ -190,7 +190,30 @@ function CheckStatus(rows,columns)
 	{
 		for(c = 0;c < columns; ++c)
 		{
-			if(balls[r][c].Status == 4)
+			if((r==0&&c==0)||(r==0&&c==Columns-1)||(r==Rows-1&&c==0)||(r==Rows-1&&c==Columns-1))
+			{
+				if(balls[r][c].Status == 2)
+				{
+					//console.log("animate for two "+r+" "+c);
+					to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
+					balls[r][c].Status = 0;
+					balls[r][c].player_id = 0;
+					flag = true;
+					//console.log("Status == 4 found at ",r," ",c);
+				}
+			}
+			else if(((r==0||r==Rows-1)&&(c>0&&c<Columns-1))||((c==0||c==Columns-1)&&(r>0&&r<Rows-1)))
+			{
+				if(balls[r][c].Status == 3)
+				{
+					to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
+					balls[r][c].Status = 0;
+					balls[r][c].player_id = 0;
+					flag = true;
+					//console.log("Status == 4 found at ",r," ",c);
+				}
+			}
+			else if(balls[r][c].Status == 4)
 			{
 				to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
 				balls[r][c].Status = 0;
@@ -259,7 +282,7 @@ function DrawBallTraversal(ballRadius)
 }
 function updateStatus(x,y,id)
 {
-	console.log("Status updated for ",x," ",y);
+	//console.log("Status updated for ",x," ",y);
 	balls[x][y].Status+=1;
 	balls[x][y].player_id=id;
 }
