@@ -25,7 +25,8 @@ var to_translate = [];
 var iter_translate = 0;
 var dx1=4;
 var dy1=4;
-
+var GameOverFlag = false;
+var iter_GameOver = 0;
 /*
 
 In x,y corrdinate space
@@ -258,7 +259,7 @@ function DrawBallTraversal(ballRadius)
 }
 function updateStatus(x,y,id)
 {
-	//console.log("Status updated for ",x," ",y);
+	console.log("Status updated for ",x," ",y);
 	balls[x][y].Status+=1;
 	balls[x][y].player_id=id;
 }
@@ -288,6 +289,44 @@ function updateNeighbour()
 		}
 		
 	}
+}
+function GameOver()
+{
+	var p1=-1;
+	var p2=-1;
+	for(r = 0;r<Rows; ++r)
+	{
+		for(c = 0;c<Columns;++c)
+		{
+			if(balls[r][c].Status>0)
+			{
+				if(p1==-1)
+				{
+					p1=balls[r][c].player_id;
+				}
+				else if(balls[r][c].player_id != p1)
+				{
+					p2=balls[r][c].player_id;
+					break;
+
+				}
+			}
+
+		}
+		if(p2!=-1)
+		{
+			break;
+		}
+	}
+	if(p2==-1)
+	{
+		p1++;
+		
+		//document.location.reload();
+		return p1;
+
+	}
+	return 0;
 }
 function Draw()
 {
@@ -329,10 +368,20 @@ function Draw()
 			to_translate = [];
 			animateFlag = false;
 			iter_translate = 0;
+			GameOverFlag = GameOver();
 		}
 	}
 
 	DrawBalls(Rows,Columns,ballRadius,x,y);
+	if(GameOverFlag)
+	{
+		if(iter_GameOver==20)
+		{
+			alert("GameOver Player number "+GameOverFlag+" wins");
+			window.location.reload();
+		}
+		iter_GameOver++;
+	}
 	
 	/*if(x+ballRadius+xdis>HorizontalDistanceBetween2Lines||x+xdis<ballRadius||y+ballRadius+ydis>VerticalDistanceBetween2Lines||y+ydis<ballRadius)
 	{
