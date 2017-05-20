@@ -1,5 +1,6 @@
 $(document).ready(function(){
-var canvas = document.getElementById("myCanvas");
+//var canvas = document.getElementById("myCanvas");
+var canvas = $("#myCanvas")[0];
 var ctx = canvas.getContext("2d");
 var GridStartX = 10;
 var GridStartY = 10;
@@ -480,7 +481,7 @@ function BoxDetect(x,y,rows,columns)
 	}
 
 }
-var temp = $(myCanvas);
+var temp = $("#myCanvas");
 temp.on( "click", function( event ) {
  // console.log( "pageX: " + event.pageX + ", pageY: " + event.pageY );
   var offset = temp.offset();
