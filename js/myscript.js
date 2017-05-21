@@ -14,7 +14,7 @@ var y = 10//center y coordinate for second circle
 var dx = 0;
 var dy = 0;
 var grid = [];
-var colors = ['#E9D400','#1FAF1F'];//#E9DB77
+var colors = ['#ccba1c','#1FAF1F'];//#E9DB77
 var players = [];
 var total_players = 2;//By Deafult number of players
 var currentPlayer = 0;//by default current player is first
@@ -104,13 +104,13 @@ function initializeGrid(rows,columns)//grid[r][c] = top left cordinates for r,c 
 	}
 }
 
-function DrawVerticalLines(num)
+function DrawVerticalLines(num,x,y)
 {
 	var DistanceBetween2Lines = (canvas.width-20)/num;
-	var StartX = GridStartX;
-	var StartY = GridStartY;
-	var EndX = GridStartX;
-	var EndY = GridEndY;
+	var StartX = GridStartX+x;
+	var StartY = GridStartY+y;
+	var EndX = GridStartX+x;
+	var EndY = GridEndY+y;
 	ctx.beginPath();
 	for(count = 0; count <= num; ++count)
 	{
@@ -126,13 +126,13 @@ function DrawVerticalLines(num)
 
 }
 
-function DrawHorizontalLines(num)
+function DrawHorizontalLines(num,x,y)
 {
 	var DistanceBetween2Lines = (canvas.height - 20)/num;
-	var StartX = GridStartX;
-	var StartY = GridStartY;
-	var EndX = GridEndX;
-	var Endy = GridStartY;
+	var StartX = GridStartX+x;
+	var StartY = GridStartY+y;
+	var EndX = GridEndX+x;
+	var Endy = GridStartY+y;
 
 	ctx.beginPath();
 	for(count = 0 ;count <= num ;++count)
@@ -148,10 +148,10 @@ function DrawHorizontalLines(num)
 	return DistanceBetween2Lines;
 }
 //It should be the first function to be called
-function DrawGrid(rows,columns)
+function DrawGrid(rows,columns,x,y)
 {
-	HorizontalDistanceBetween2Lines = DrawVerticalLines(columns);
-	VerticalDistanceBetween2Lines = DrawHorizontalLines(rows);
+	HorizontalDistanceBetween2Lines = DrawVerticalLines(columns,x,y);
+	VerticalDistanceBetween2Lines = DrawHorizontalLines(rows,x,y);
 	return Math.min(HorizontalDistanceBetween2Lines,VerticalDistanceBetween2Lines);
 }
 
@@ -389,7 +389,8 @@ function GameOver()
 function Draw()
 {
 	ctx.clearRect(0,0,canvas.width,canvas.height);
-	MaxDiameter = DrawGrid(Rows,Columns);
+	MaxDiameter = DrawGrid(Rows,Columns,0,0);
+	DrawGrid(Rows,Columns,4,4);
 
 	var ballRadius = MaxDiameter/6;
 	
