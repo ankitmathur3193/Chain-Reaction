@@ -14,7 +14,7 @@ var y = 10//center y coordinate for second circle
 var dx = 0;
 var dy = 0;
 var grid = [];
-var colors = ['#ccba1c','#1FAF1F'];//#E9DB77
+var colors = ['#934D0D','#0C910C'];//#E9DB77
 var players = [];
 var total_players = 2;//By Deafult number of players
 var currentPlayer = 0;//by default current player is first
@@ -44,9 +44,10 @@ t1Canvas.height = 20;
 var t1Ctx = t1Canvas.getContext('2d');
 var radius = t1Canvas.width / 2;
 var t1Grad = t1Ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
-t1Grad.addColorStop(0, '#F4F201');
-t1Grad.addColorStop(0.8, '#E4C700');
-t1Grad.addColorStop(1, 'rgba(228,199,0,0)');
+t1Grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+t1Grad.addColorStop(0.2, 'rgba(255, 195, 85, 1)');
+t1Grad.addColorStop(0.95, 'rgba(128, 56, 0, 1)');
+t1Grad.addColorStop(1, 'rgba(128, 56, 0, 0)');
 t1Ctx.fillStyle = t1Grad;
 t1Ctx.fillRect(0, 0, t1Canvas.width, t1Canvas.height);
 canvasarray.push(t1Canvas);
