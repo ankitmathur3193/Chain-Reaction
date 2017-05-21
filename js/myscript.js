@@ -14,7 +14,7 @@ var y = 10//center y coordinate for second circle
 var dx = 0;
 var dy = 0;
 var grid = [];
-var colors = ['#800000','#228B22'];
+var colors = ['#E9D400','#1FAF1F'];//#E9DB77
 var players = [];
 var total_players = 2;//By Deafult number of players
 var currentPlayer = 0;//by default current player is first
@@ -35,6 +35,39 @@ In x,y corrdinate space
 row = y axis
 column = x axis
 */
+var canvasarray=[];
+
+//for player1
+var t1Canvas = document.createElement('canvas');
+t1Canvas.width = 20;
+t1Canvas.height = 20;
+var t1Ctx = t1Canvas.getContext('2d');
+var radius = t1Canvas.width / 2;
+var t1Grad = t1Ctx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+t1Grad.addColorStop(0, '#F4F201');
+t1Grad.addColorStop(0.8, '#E4C700');
+t1Grad.addColorStop(1, 'rgba(228,199,0,0)');
+t1Ctx.fillStyle = t1Grad;
+t1Ctx.fillRect(0, 0, t1Canvas.width, t1Canvas.height);
+canvasarray.push(t1Canvas);
+
+
+//for player2
+var tmpCanvas = document.createElement('canvas');
+tmpCanvas.width = 20;
+tmpCanvas.height = 20;
+var tmpCtx = tmpCanvas.getContext('2d');
+var radius = tmpCanvas.width / 2;
+var tmpGrad = tmpCtx.createRadialGradient(radius, radius, 0, radius, radius, radius);
+tmpGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+tmpGrad.addColorStop(0.2, 'rgba(85, 255, 85, 1)');
+tmpGrad.addColorStop(0.95, 'rgba(0, 128, 0, 1)');
+tmpGrad.addColorStop(1, 'rgba(0, 128, 0, 0)');
+tmpCtx.fillStyle = tmpGrad;
+tmpCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
+canvasarray.push(tmpCanvas);
+
+
 
 function Player(id,color)
 {
@@ -134,15 +167,12 @@ function intializeBalls(rows,columns)//Status  = 0 means box is empty
 		}
 	}
 }
-function DrawBall(x,y,ballRadius,color)
+function DrawBall(x,y,radius,player_id)
 {
-	
+		//console.log("player id is :",player_id);
 		ctx.beginPath();
-		ctx.arc(x,y,ballRadius,0,Math.PI*2);
-		ctx.fillStyle = color;
-		ctx.fill();
-		ctx.closePath();	
-	
+		ctx.drawImage(canvasarray[player_id], x - radius, y - radius, radius<<1, radius<<1);
+        ctx.closePath();	
 	
 }
 //x1,y1 corresponds to left start grid
@@ -152,7 +182,7 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 
 	var x = x1+HorizontalDistanceBetween2Lines/2;
 	var y = y1+VerticalDistanceBetween2Lines/2;
-	color = "#0095DD";
+	//color = "#0095DD";
 	
 
 	for(r = 0;r < rows; ++r)
@@ -164,20 +194,20 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 			if(balls[r][c].Status == 1)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,balls[r][c].player_id);
 			}
 			else if(balls[r][c].Status == 2)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
-				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,balls[r][c].player_id);
+				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,balls[r][c].player_id);
 			}
 			else if(balls[r][c].Status == 3)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
-				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,players[balls[r][c].player_id].color);
-				DrawBall(balls[r][c].x,balls[r][c].y-10,ballRadius,players[balls[r][c].player_id].color);
+				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,balls[r][c].player_id);
+				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,balls[r][c].player_id);
+				DrawBall(balls[r][c].x,balls[r][c].y-10,ballRadius,balls[r][c].player_id);
 			}
 		}
 	}
@@ -281,7 +311,7 @@ function DrawBallTraversal(ballRadius)
 		var c = balls[x1][y1].y;
 		r = r + a*dx1;
 		c = c + b*dy1;
-		DrawBall(r,c,ballRadius,colors[id]);
+		DrawBall(r,c,ballRadius,id);
 		
 	}
 }
