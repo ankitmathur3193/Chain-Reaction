@@ -21,8 +21,8 @@ var currentPlayer = 0;//by default current player is first
 var to_animate = [];
 var lock = false;
 var animateFlag = false;
-var Rows = 8;
-var Columns = 8;
+var Rows = 8;//y axis
+var Columns = 8;//x axis
 var to_translate = [];
 var iter_translate = 0;
 var dx1=4;
@@ -95,12 +95,12 @@ function initializeGrid(rows,columns)//grid[r][c] = top left cordinates for r,c 
 	var y1 = 10;
 	var xdis = HorizontalDistanceBetween2Lines;
 	var ydis = VerticalDistanceBetween2Lines;
-	for(r = 0; r < rows; ++r)
+	for(c = 0;c < columns; ++c)
 	{
-		grid[r] = []
-		for(c =0 ;c < columns; ++c)
+		grid[c] = [];
+		for(r = 0;r < rows; ++r)
 		{
-			grid[r][c]={x:x1+c*xdis,y:y1+r*ydis};
+			grid[c][r]={x:x1+c*xdis,y:y1+r*ydis};
 		}
 	}
 }
@@ -158,13 +158,12 @@ function DrawGrid(rows,columns,x,y)
 
 function intializeBalls(rows,columns)//Status  = 0 means box is empty
 {
-	
-	for(r = 0;r < rows; ++r)
+	for(c = 0;c < columns; ++c)
 	{
-		balls[r] = [];
-		for(c = 0;c < columns; ++c)
+		balls[c] = [];
+		for(r = 0;r < rows; ++r)
 		{
-			balls[r][c] = {x:0,y:0,Status:0,player_id:0};
+			balls[c][r] = {x:0,y:0,Status:0,player_id:0};
 		}
 	}
 }
@@ -190,25 +189,25 @@ function DrawBalls(rows,columns,ballRadius,x1,y1)
 	{
 		for(c =0 ;c < columns; ++c)
 		{
-			balls[r][c].x = x + c * HorizontalDistanceBetween2Lines;
-			balls[r][c].y = y + r * VerticalDistanceBetween2Lines;
-			if(balls[r][c].Status == 1)
+			balls[c][r].x = x + c * HorizontalDistanceBetween2Lines;
+			balls[c][r].y = y + r * VerticalDistanceBetween2Lines;
+			if(balls[c][r].Status == 1)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,balls[r][c].player_id);
+				DrawBall(balls[c][r].x,balls[c][r].y,ballRadius,balls[c][r].player_id);
 			}
-			else if(balls[r][c].Status == 2)
+			else if(balls[c][r].Status == 2)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,balls[r][c].player_id);
-				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,balls[r][c].player_id);
+				DrawBall(balls[c][r].x,balls[c][r].y,ballRadius,balls[c][r].player_id);
+				DrawBall(balls[c][r].x-10,balls[c][r].y,ballRadius,balls[c][r].player_id);
 			}
-			else if(balls[r][c].Status == 3)
+			else if(balls[c][r].Status == 3)
 			{
 				//console.log("Ball Drawn at ",r," ",c);
-				DrawBall(balls[r][c].x,balls[r][c].y,ballRadius,balls[r][c].player_id);
-				DrawBall(balls[r][c].x-10,balls[r][c].y,ballRadius,balls[r][c].player_id);
-				DrawBall(balls[r][c].x,balls[r][c].y-10,ballRadius,balls[r][c].player_id);
+				DrawBall(balls[c][r].x,balls[c][r].y,ballRadius,balls[c][r].player_id);
+				DrawBall(balls[c][r].x-10,balls[c][r].y,ballRadius,balls[c][r].player_id);
+				DrawBall(balls[c][r].x,balls[c][r].y-10,ballRadius,balls[c][r].player_id);
 			}
 		}
 	}
@@ -225,35 +224,35 @@ function CheckStatus(rows,columns)
 		{
 			if((r==0&&c==0)||(r==0&&c==Columns-1)||(r==Rows-1&&c==0)||(r==Rows-1&&c==Columns-1))
 			{
-				if(balls[r][c].Status >= 2)
+				if(balls[c][r].Status >= 2)
 				{
 					//console.log("animate for two "+r+" "+c);
-					to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
-					balls[r][c].Status-=2;
-					if(balls[r][c].Status==0)
-					balls[r][c].player_id = 0;
+					to_animate.push({x:c,y:r,id:balls[c][r].player_id});//inserting box number
+					balls[c][r].Status-=2;
+					if(balls[c][r].Status==0)
+					balls[c][r].player_id = 0;
 					flag = true;
 					//console.log("Status == 4 found at ",r," ",c);
 				}
 			}
 			else if(((r==0||r==Rows-1)&&(c>0&&c<Columns-1))||((c==0||c==Columns-1)&&(r>0&&r<Rows-1)))
 			{
-				if(balls[r][c].Status>=3)
+				if(balls[c][r].Status>=3)
 				{
-					to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
-					balls[r][c].Status-=3;
-					if(balls[r][c].Status==0)
-					balls[r][c].player_id = 0;
+					to_animate.push({x:c,y:r,id:balls[c][r].player_id});//inserting box number
+					balls[c][r].Status-=3;
+					if(balls[c][r].Status==0)
+					balls[c][r].player_id = 0;
 					flag = true;
 					//console.log("Status == 4 found at ",r," ",c);
 				}
 			}
-			else if(balls[r][c].Status>=4)
+			else if(balls[c][r].Status>=4)
 			{
-				to_animate.push({x:r,y:c,id:balls[r][c].player_id});//inserting box number
-				balls[r][c].Status-=4;
-				if(balls[r][c].Status==0)
-				balls[r][c].player_id = 0;
+				to_animate.push({x:c,y:r,id:balls[c][r].player_id});//inserting box number
+				balls[c][r].Status-=4;
+				if(balls[c][r].Status==0)
+				balls[c][r].player_id = 0;
 				flag = true;
 				//console.log("Status == 4 found at ",r," ",c);
 			}
@@ -279,22 +278,22 @@ function bfs()
 		if(func(x1+1,y1))
 		{
 			//console.log("Increasing Row y",x1," ",y1);
-			to_translate.push({x:x1,y:y1,a:0,b:1,id:id});
+			to_translate.push({x:x1,y:y1,a:1,b:0,id:id});
 		}
 		if(func(x1-1,y1))
 		{
 			//console.log("Decreasing  Row y",x1," ",y1);
-			to_translate.push({x:x1,y:y1,a:0,b:-1,id:id});
+			to_translate.push({x:x1,y:y1,a:-1,b:0,id:id});
 		}
 		if(func(x1,y1+1))
 		{
 			//console.log("Increasing Columns x",x1," ",y1);
-			to_translate.push({x:x1,y:y1,a:1,b:0,id:id});
+			to_translate.push({x:x1,y:y1,a:0,b:1,id:id});
 		}
 		if(func(x1,y1-1))
 		{
 			//console.log("Decreasing  Columns x",x1," ",y1);
-			to_translate.push({x:x1,y:y1,a:-1,b:0,id:id});
+			to_translate.push({x:x1,y:y1,a:0,b:-1,id:id});
 		}
 		
 	}
@@ -308,11 +307,11 @@ function DrawBallTraversal(ballRadius)
 		var id = to_translate[i].id;
 		var a = to_translate[i].a;
 		var b = to_translate[i].b;
-		var r = balls[x1][y1].x;
-		var c = balls[x1][y1].y;
-		r = r + a*dx1;
-		c = c + b*dy1;
-		DrawBall(r,c,ballRadius,id);
+		var x = balls[x1][y1].x;
+		var y = balls[x1][y1].y;
+		x = x + a*dx1;
+		y = y + b*dy1;
+		DrawBall(x,y,ballRadius,id);
 		
 	}
 }
@@ -357,15 +356,15 @@ function GameOver()
 	{
 		for(c = 0;c<Columns;++c)
 		{
-			if(balls[r][c].Status>0)
+			if(balls[c][r].Status>0)
 			{
 				if(p1==-1)
 				{
-					p1=balls[r][c].player_id;
+					p1=balls[c][r].player_id;
 				}
-				else if(balls[r][c].player_id != p1)
+				else if(balls[c][r].player_id != p1)
 				{
-					p2=balls[r][c].player_id;
+					p2=balls[c][r].player_id;
 					break;
 
 				}
@@ -479,22 +478,22 @@ function BoxDetect(x,y,rows,columns)
 	{
 		for(c =0 ;c < columns; ++c)
 		{
-			x1=grid[r][c].x ;
-			y1=grid[r][c].y ;
+			x1=grid[c][r].x ;
+			y1=grid[c][r].y ;
 			if(x1<=x&&x<=x1+xdis&&y1<=y&&y<=y1+ydis)
 			{
 				//console.log("Touch found at ",r," ",c);
-				if(balls[r][c].Status == 0)
+				if(balls[c][r].Status == 0)
 				{
-					balls[r][c].Status = 1;
-					balls[r][c].player_id = currentPlayer;
+					balls[c][r].Status = 1;
+					balls[c][r].player_id = currentPlayer;
 					currentPlayer = (currentPlayer+1)%2;
 					flag = 1;
 					break;
 				}
-				else if(currentPlayer == balls[r][c].player_id)
+				else if(currentPlayer == balls[c][r].player_id)
 				{
-					balls[r][c].Status++;
+					balls[c][r].Status++;
 					currentPlayer = (currentPlayer+1)%2;
 					flag = 1;
 					break;
